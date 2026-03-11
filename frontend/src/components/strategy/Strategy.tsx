@@ -31,7 +31,7 @@ interface UndercutResult {
   notes: string;
 }
 
-const API_BASE = 'http://localhost:8400/api/v1';
+const API_BASE = `http://${window.location.hostname}:8400/api/v1`;
 
 export function Strategy() {
   const frame = useTelemetryStore((s) => s.frame);
