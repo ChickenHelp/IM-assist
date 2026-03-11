@@ -39,34 +39,36 @@ export function GaugeRing({
 
   return (
     <div className="flex flex-col items-center">
-      <svg width={size} height={size} className="-rotate-90">
-        {/* Background ring */}
-        <circle
-          cx={size / 2}
-          cy={size / 2}
-          r={radius}
-          fill="none"
-          stroke="#1E1E2E"
-          strokeWidth={6}
-        />
-        {/* Value ring */}
-        <circle
-          cx={size / 2}
-          cy={size / 2}
-          r={radius}
-          fill="none"
-          stroke={activeColor}
-          strokeWidth={6}
-          strokeDasharray={circumference}
-          strokeDashoffset={offset}
-          className="gauge-ring"
-          strokeLinecap="round"
-        />
-      </svg>
-      {/* Center label */}
-      <div className="absolute flex flex-col items-center justify-center" style={{ width: size, height: size }}>
-        <span className="font-mono text-xl font-bold">{Math.round(value)}</span>
-        <span className="text-xs text-pitwall-text-dim">{unit}</span>
+      <div className="relative" style={{ width: size, height: size }}>
+        <svg width={size} height={size} className="-rotate-90">
+          {/* Background ring */}
+          <circle
+            cx={size / 2}
+            cy={size / 2}
+            r={radius}
+            fill="none"
+            stroke="#1E1E2E"
+            strokeWidth={6}
+          />
+          {/* Value ring */}
+          <circle
+            cx={size / 2}
+            cy={size / 2}
+            r={radius}
+            fill="none"
+            stroke={activeColor}
+            strokeWidth={6}
+            strokeDasharray={circumference}
+            strokeDashoffset={offset}
+            className="gauge-ring"
+            strokeLinecap="round"
+          />
+        </svg>
+        {/* Center label — absolutely positioned over the SVG */}
+        <div className="absolute inset-0 flex flex-col items-center justify-center">
+          <span className="font-mono text-xl font-bold">{Math.round(value)}</span>
+          <span className="text-[10px] text-pitwall-text-dim">{unit}</span>
+        </div>
       </div>
       <span className="text-xs text-pitwall-text-dim mt-1">{label}</span>
     </div>

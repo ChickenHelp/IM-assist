@@ -8,11 +8,12 @@
  * - Tyre indicator
  * - Fuel bar
  * - Flag indicator
- * - Proximity radar
+ * - AI alerts
  */
 
 import { useTelemetryStore } from '../../store/telemetryStore';
 import { DataCard } from '../common/DataCard';
+import { GaugeRing } from '../common/GaugeRing';
 import { TyreIndicator } from '../common/TyreIndicator';
 import { FuelBar } from '../common/FuelBar';
 import { FlagIndicator } from '../common/FlagIndicator';
@@ -23,6 +24,7 @@ export function LiveRace() {
   const frame = useTelemetryStore((s) => s.frame);
   const standings = useTelemetryStore((s) => s.standings);
   const positions = useTelemetryStore((s) => s.positions);
+  const alerts = useTelemetryStore((s) => s.alerts);
 
   if (!frame) {
     return (
@@ -50,14 +52,19 @@ export function LiveRace() {
 
       {/* Center column — Main telemetry */}
       <div className="col-span-4 space-y-4">
-        {/* Speed + RPM + Gear */}
+        {/* Speed + RPM gauges + Gear */}
         <DataCard title="Telemetry">
           <div className="flex items-center justify-around">
-            {/* Speed */}
-            <div className="text-center">
-              <div className="font-mono text-4xl font-bold">{Math.round(frame.speed)}</div>
-              <div className="text-xs text-pitwall-text-dim">km/h</div>
-            </div>
+            <GaugeRing
+              value={frame.speed}
+              max={350}
+              label="Speed"
+              unit="km/h"
+              size={110}
+              color="#30D158"
+              warningThreshold={280}
+              criticalThreshold={320}
+            />
             {/* Gear */}
             <div className="text-center">
               <div
@@ -68,11 +75,16 @@ export function LiveRace() {
               </div>
               <div className="text-xs text-pitwall-text-dim">Gear</div>
             </div>
-            {/* RPM */}
-            <div className="text-center">
-              <div className="font-mono text-2xl font-bold">{frame.rpm.toLocaleString()}</div>
-              <div className="text-xs text-pitwall-text-dim">RPM</div>
-            </div>
+            <GaugeRing
+              value={frame.rpm}
+              max={12000}
+              label="RPM"
+              unit="rpm"
+              size={110}
+              color="#E10600"
+              warningThreshold={9000}
+              criticalThreshold={10500}
+            />
           </div>
 
           {/* Throttle / Brake bars */}
@@ -152,7 +164,7 @@ export function LiveRace() {
         </DataCard>
       </div>
 
-      {/* Right column — Tyres, Fuel, Conditions */}
+      {/* Right column — Tyres, Fuel, Conditions, Alerts */}
       <div className="col-span-3 space-y-4">
         <DataCard title="Tyres">
           <TyreIndicator tyres={frame.tyres} />
@@ -185,6 +197,29 @@ export function LiveRace() {
             </div>
           </div>
         </DataCard>
+
+        {/* AI Alerts */}
+        {alerts.length > 0 && (
+          <DataCard title="AI Alerts">
+            <div className="space-y-2">
+              {alerts.map((alert, i) => (
+                <div
+                  key={i}
+                  className={`text-xs px-3 py-2 rounded-lg border ${
+                    alert.severity === 'critical'
+                      ? 'bg-red-500/10 border-red-500/30 text-red-400'
+                      : alert.severity === 'warning'
+                        ? 'bg-yellow-500/10 border-yellow-500/30 text-yellow-400'
+                        : 'bg-blue-500/10 border-blue-500/30 text-blue-400'
+                  }`}
+                >
+                  <span className="font-bold uppercase mr-2">{alert.severity}</span>
+                  {alert.message}
+                </div>
+              ))}
+            </div>
+          </DataCard>
+        )}
       </div>
     </div>
   );

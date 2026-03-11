@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useTelemetryConnection } from './hooks/useTelemetry';
 import { useTelemetryStore } from './store/telemetryStore';
 import { Header } from './components/layout/Header';
@@ -9,11 +9,41 @@ import { Communication } from './components/communication/Communication';
 
 type Tab = 'live' | 'strategy' | 'performance' | 'communication';
 
+const TAB_KEYS: Record<string, Tab> = {
+  '1': 'live',
+  '2': 'strategy',
+  '3': 'performance',
+  '4': 'communication',
+};
+
 export function App() {
   const [activeTab, setActiveTab] = useState<Tab>('live');
   useTelemetryConnection();
 
   const connected = useTelemetryStore((s) => s.connected);
+
+  // Keyboard shortcuts: 1-4 to switch tabs
+  const handleKeyDown = useCallback((e: KeyboardEvent) => {
+    // Ignore when typing in inputs
+    if (
+      e.target instanceof HTMLInputElement ||
+      e.target instanceof HTMLTextAreaElement ||
+      e.target instanceof HTMLSelectElement
+    ) {
+      return;
+    }
+
+    const tab = TAB_KEYS[e.key];
+    if (tab) {
+      e.preventDefault();
+      setActiveTab(tab);
+    }
+  }, []);
+
+  useEffect(() => {
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [handleKeyDown]);
 
   const tabs: { id: Tab; label: string; shortcut: string }[] = [
     { id: 'live', label: 'Live Race', shortcut: '1' },
@@ -38,6 +68,14 @@ export function App() {
             <kbd className="ml-2 text-xs opacity-40">{tab.shortcut}</kbd>
           </button>
         ))}
+
+        {/* Connection status in tab bar */}
+        {!connected && (
+          <div className="ml-auto flex items-center gap-2 text-xs text-yellow-400">
+            <div className="w-2 h-2 rounded-full bg-yellow-400 animate-pulse" />
+            <span>Connecting to server...</span>
+          </div>
+        )}
       </nav>
 
       {/* Content */}

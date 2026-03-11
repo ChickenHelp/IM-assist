@@ -36,7 +36,8 @@ class TelemetryWebSocket {
 
     this.ws.onmessage = (event: MessageEvent) => {
       try {
-        const msg: WSMessage = JSON.parse(event.data);
+        const msg: WSMessage & { alerts?: Array<{ type: string; severity: string; message: string }> } =
+          JSON.parse(event.data);
         const store = useTelemetryStore.getState();
 
         switch (msg.type) {
@@ -44,6 +45,16 @@ class TelemetryWebSocket {
             store.setFrame(msg.data);
             if (msg.session_id && !store.sessionId) {
               store.setSessionId(msg.session_id);
+            }
+            // Handle AI alerts
+            if (msg.alerts && msg.alerts.length > 0) {
+              store.setAlerts(
+                msg.alerts.map((a) => ({
+                  type: a.type,
+                  severity: a.severity as 'info' | 'warning' | 'critical',
+                  message: a.message,
+                })),
+              );
             }
             break;
           case 'standings':

@@ -10,6 +10,12 @@ import type {
   DriverPosition,
 } from '../types/telemetry';
 
+export interface AIAlert {
+  type: string;
+  severity: 'info' | 'warning' | 'critical';
+  message: string;
+}
+
 interface TelemetryState {
   /** Current telemetry frame. */
   frame: TelemetryFrame | null;
@@ -23,12 +29,15 @@ interface TelemetryState {
   sessionId: string | null;
   /** History of recent frames for charts (last 300 = 10s at 30Hz). */
   history: TelemetryFrame[];
+  /** Current AI alerts. */
+  alerts: AIAlert[];
 
   // Actions
   setFrame: (frame: TelemetryFrame) => void;
   setStandings: (entries: StandingsEntry[], positions: DriverPosition[]) => void;
   setConnected: (connected: boolean) => void;
   setSessionId: (id: string) => void;
+  setAlerts: (alerts: AIAlert[]) => void;
 }
 
 const HISTORY_SIZE = 300;
@@ -40,6 +49,7 @@ export const useTelemetryStore = create<TelemetryState>((set) => ({
   connected: false,
   sessionId: null,
   history: [],
+  alerts: [],
 
   setFrame: (frame) =>
     set((state) => {
@@ -53,4 +63,5 @@ export const useTelemetryStore = create<TelemetryState>((set) => ({
   setStandings: (entries, positions) => set({ standings: entries, positions }),
   setConnected: (connected) => set({ connected }),
   setSessionId: (sessionId) => set({ sessionId }),
+  setAlerts: (alerts) => set({ alerts }),
 }));
