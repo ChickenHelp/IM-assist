@@ -31,7 +31,8 @@ interface UndercutResult {
   notes: string;
 }
 
-const API_BASE = `http://${window.location.hostname}:8400/api/v1`;
+const BACKEND_HOST = import.meta.env.VITE_BACKEND_HOST || window.location.hostname;
+const API_BASE = `http://${BACKEND_HOST}:8400/api/v1`;
 
 export function Strategy() {
   const frame = useTelemetryStore((s) => s.frame);

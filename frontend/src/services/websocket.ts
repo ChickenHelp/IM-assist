@@ -106,7 +106,7 @@ class TelemetryWebSocket {
 
 // Default instance — connects to the server on the same host
 export function createTelemetryWS(host?: string): TelemetryWebSocket {
-  const wsHost = host || window.location.hostname;
+  const wsHost = host || import.meta.env.VITE_BACKEND_HOST || window.location.hostname;
   const url = `ws://${wsHost}:8400/ws/telemetry`;
   return new TelemetryWebSocket(url);
 }
