@@ -23,13 +23,8 @@ class Settings(BaseSettings):
     # Database
     db_path: str = "pitwall.db"
 
-    # LAN
-    allowed_origins: list[str] = [
-        "http://localhost:3000",
-        "http://localhost:5173",
-        "http://127.0.0.1:3000",
-        "http://127.0.0.1:5173",
-    ]
+    # LAN — "*" allows any origin (safe for LAN-only use)
+    allowed_origins: list[str] = ["*"]
     lan_subnet: str = "192.168.0.0/16"
 
     # WebRTC
